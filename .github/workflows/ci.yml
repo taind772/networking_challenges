@@ -19,12 +19,12 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Release
-      run: cargo build --release --verbose && strip target/release/networking_challenges
+      run: cargo build --release --verbose
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/networking_challenges
+        file: target/release/networking_challenges*
         tag: latest
         overwrite: true
         body: "New release!"
