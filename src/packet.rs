@@ -20,7 +20,7 @@ pub enum PacketType {
 }
 
 impl PacketType {
-    pub fn to_id(&self) -> u32 {
+    fn to_id(&self) -> u32 {
         match self {
             Self::PktHello => PKT_HELLO,
             Self::PktCalc => PKT_CALC,
@@ -29,7 +29,7 @@ impl PacketType {
             Self::PktFlag => PKT_FLAG,
         }
     }
-    pub fn from_id(id: u32) -> Result<Self, &'static str> {
+    fn from_id(id: u32) -> Result<Self, &'static str> {
         match id {
             PKT_HELLO => Ok(Self::PktHello),
             PKT_CALC => Ok(Self::PktCalc),
@@ -48,7 +48,7 @@ impl Packet {
     pub fn new(kind: PacketType, data: Option<&[u8]>) -> Self {
         use std::convert::TryFrom;
         let data = data.unwrap_or(&[]);
-        let len = u32::try_from(data.len()).unwrap();
+        let len = u32::try_from(data.len()).expect("Data len is bigger than u32 bound");
 
         let mut bytes = Vec::from(kind.to_id().to_le_bytes());
         bytes.extend_from_slice(&len.to_le_bytes());
@@ -80,11 +80,12 @@ impl Packet {
     }
 
     pub fn read(stream: &mut TcpStream) -> Result<Self, Box<dyn std::error::Error>> {
+        use std::convert::TryFrom;
         let mut buf = [0; HEADER_SIZE];
         stream.read_exact(&mut buf)?;
         let mut pkt = Self::from_bytes(&buf);
         if pkt.data_len() > 0 {
-            let mut buf = vec![0; pkt.data_len() as usize];
+            let mut buf = vec![0; usize::try_from(pkt.data_len())?];
             stream.read_exact(&mut buf)?;
             pkt.bytes.append(&mut buf);
         };

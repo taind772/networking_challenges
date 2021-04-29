@@ -11,36 +11,45 @@ pub mod constants;
 pub mod packet;
 
 pub fn bytes_to_u32(bytes: &[u8]) -> u32 {
-    u32::from_le_bytes(bytes.clone().to_owned().try_into().unwrap())
+    u32::from_le_bytes(
+        bytes
+            .clone()
+            .to_owned()
+            .try_into()
+            .expect(&format!("Could not parse bytes: {:?}", bytes)),
+    )
 }
 
 pub fn run(addr: &str, handle_calc: fn(&[u32]) -> u32) {
-    let mut stream = TcpStream::connect(addr).unwrap();
+    let mut stream =
+        TcpStream::connect(addr).expect(&format!("Could not connect to TcpStream at {}", addr));
     //Say hello to server
     println!("Sending hello");
     Packet::new(PacketType::PktHello, Some(STUDENT_ID.as_bytes()))
         .send(&mut stream)
-        .expect("could not send hello to server");
+        .expect("Could not send hello to server");
 
     //Read request from server
     loop {
-        let rev = Packet::read(&mut stream).unwrap();
+        let rev = Packet::read(&mut stream).expect("Could not read the receive packet from stream");
         match rev.kind() {
             PacketType::PktHello => {
                 println!("Server say hello!");
             }
             PacketType::PktCalc => {
                 println!("Server requests to calc some math.");
-                let data = rev
-                    .data()
-                    .unwrap()
-                    .chunks_exact(BYTES_PER_U32)
-                    .map(bytes_to_u32)
-                    .collect::<Vec<_>>();
-                let result = handle_calc(&data);
-                Packet::new(PacketType::PktResult, Some(&result.to_le_bytes()))
-                    .send(&mut stream)
-                    .unwrap();
+                if let Some(data) = rev.data() {
+                    let data = data
+                        .chunks_exact(BYTES_PER_U32)
+                        .map(bytes_to_u32)
+                        .collect::<Vec<_>>();
+                    let result = handle_calc(&data);
+                    Packet::new(PacketType::PktResult, Some(&result.to_le_bytes()))
+                        .send(&mut stream)
+                        .expect("Could not send result back to server");
+                } else {
+                    println!("Calc-packet's data is empty.")
+                }
             }
             PacketType::PktResult => {
                 panic!("Something went wrong! -- Server should not response a PktResult at all!");
@@ -51,9 +60,13 @@ pub fn run(addr: &str, handle_calc: fn(&[u32]) -> u32) {
             }
             PacketType::PktFlag => {
                 println!("Ok");
-                let flag = rev.data().unwrap();
-                println!("{}", flag.iter().map(|&v| v as char).collect::<String>());
-                break;
+                if let Some(flag) = rev.data() {
+                    println!(
+                        "{}",
+                        flag.iter().map(|&v| char::from(v)).collect::<String>()
+                    );
+                    break;
+                }
             }
         }
     }
