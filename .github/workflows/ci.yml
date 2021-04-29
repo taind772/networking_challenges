@@ -25,7 +25,7 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Release
-      run: cargo build --release --verbose && strip target/release/networking_challenges
+      run: cargo build --release --verbose
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
