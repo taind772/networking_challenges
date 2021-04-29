@@ -3,7 +3,6 @@ use std::{convert::TryInto, net::TcpStream};
 use constants::BYTES_PER_U32;
 
 use crate::{
-    constants::STUDENT_ID,
     packet::{Packet, PacketType},
 };
 
@@ -20,12 +19,12 @@ pub fn bytes_to_u32(bytes: &[u8]) -> u32 {
     )
 }
 
-pub fn run(addr: &str, handle_calc: fn(&[u32]) -> u32) {
+pub fn run(addr: &str, student_id: &str, handle_calc: fn(&[u32]) -> u32) {
     let mut stream =
         TcpStream::connect(addr).expect(&format!("Could not connect to TcpStream at {}", addr));
     //Say hello to server
     println!("Sending hello");
-    Packet::new(PacketType::PktHello, Some(STUDENT_ID.as_bytes()))
+    Packet::new(PacketType::PktHello, Some(student_id.as_bytes()))
         .send(&mut stream)
         .expect("Could not send hello to server");
 

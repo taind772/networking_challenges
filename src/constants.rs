@@ -1,5 +1,3 @@
-pub const STUDENT_ID: &str = "18021111";
-
 pub const ADDR_PLUS: &str = "112.137.129.129:27001";
 pub const ADDR_POLY: &str = "112.137.129.129:27002";
 
