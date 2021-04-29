@@ -19,19 +19,22 @@ jobs:
             asset_name: networking_challenges-linux-amd64
           - os: windows-latest
             artifact_name: networking_challenges.exe
-            asset_name: networking_challenges-windows-amd64
+            asset_name: networking_challenges-windows-amd64.exe
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
       run: cargo test --verbose
     - name: Release
       run: cargo build --release --verbose
+    - name: Strip the released binary
+      if: ${{ runner.os == 'ubuntu-latest'}}
+      run: strip target/release/${{ matrix.artifact_name }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/release/${{ matrix.artifact_name }}
         asset_name: ${{ matrix.asset_name }}
-        tag: 1.0.0
+        tag: v1.0.1
         overwrite: true
         body: "New release!"

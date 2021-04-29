@@ -1,6 +1,6 @@
 [package]
 name = "networking_challenges"
-version = "0.1.0"
+version = "1.0.1"
 authors = ["ND Tai <49815011+ndtai772@users.noreply.github.com>"]
 edition = "2018"
 

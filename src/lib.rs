@@ -2,9 +2,7 @@ use std::{convert::TryInto, net::TcpStream};
 
 use constants::BYTES_PER_U32;
 
-use crate::{
-    packet::{Packet, PacketType},
-};
+use crate::packet::{Packet, PacketType};
 
 pub mod constants;
 pub mod packet;
