@@ -27,7 +27,7 @@ jobs:
     - name: Release
       run: cargo build --release --verbose
     - name: Strip the released binary
-      if: ${{ runner.os == 'ubuntu-latest'}}
+      if: ${{ matrix.os == 'ubuntu-latest'}}
       run: strip target/release/${{ matrix.artifact_name }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
