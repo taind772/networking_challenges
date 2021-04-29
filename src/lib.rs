@@ -8,6 +8,7 @@ use crate::{
 
 pub mod constants;
 pub mod packet;
+pub mod solve;
 
 pub fn bytes_to_u32(bytes: &[u8]) -> u32 {
     u32::from_le_bytes(
