@@ -11,7 +11,6 @@ pub mod solve;
 pub fn bytes_to_u32(bytes: &[u8]) -> u32 {
     u32::from_le_bytes(
         bytes
-            .clone()
             .to_owned()
             .try_into()
             .expect(&format!("Could not parse bytes: {:?}", bytes)),
